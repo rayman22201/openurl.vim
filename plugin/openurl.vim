@@ -36,8 +36,6 @@ let g:OpenUrlSearchEngine = "http://www.google.com/search?q="
 " define OpenUrl function
 function! OpenUrl()
 python << EOM
-# coding=utf-8
-
 import vim
 import re
 import subprocess 
@@ -61,8 +59,6 @@ endfunction
 
 function! OpenUrlSearch(term)
 python << EOM
-# coding=utf-8
-
 import vim
 import re
 import urllib
