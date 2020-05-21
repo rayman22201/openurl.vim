@@ -30,7 +30,8 @@
 " command AnotherOpenUrlName :call OpenUrl()
 "
 
-
+let g:OpenUrlPort = "44567"
+let g:OpenUrlSearchEngine = "http://www.google.com/search?q="
 
 " define OpenUrl function
 function! OpenUrl()
@@ -39,18 +40,46 @@ python << EOM
 
 import vim
 import re
-import webbrowser
+import subprocess 
 
-re_obj = re.compile(r'http://[a-zA-Z0-9-./"#$%&\':?=_]+')
+re_obj = re.compile(r'(https?|ftp)://[^\s/$.?#].[^\s]*')
 line = vim.current.line
+port = vim.eval("g:OpenUrlPort")
 match_obj = re_obj.search(line)
 
 try:
     url = match_obj.group()
-    webbrowser.open(url)
+    cmd = "echo \"{}\" | nc localhost {} -q0".format(url, port)
+    subprocess.call(cmd, shell=True)
     print 'open URL : %s' % url
 except:
-    print 'fialed! : open URL'
+    print 'failed! : open URL'
+    print "Unexpected error:", sys.exc_info()[0]
+
+EOM
+endfunction
+
+function! OpenUrlSearch(term)
+python << EOM
+# coding=utf-8
+
+import vim
+import re
+import urllib
+import subprocess 
+
+port = vim.eval("g:OpenUrlPort")
+search_url = vim.eval("g:OpenUrlSearchEngine")
+search_term = vim.eval("a:term")
+
+try:
+    full_search_url = "{}{}".format(search_url, urllib.quote_plus(search_term))
+    cmd = "echo \"{}\" | nc localhost {} -q0".format(full_search_url, port)
+    subprocess.call(cmd, shell=True)
+    print 'open URL Search : {}'.format(full_search_url)
+except:
+    print 'failed! : open URL Search'
+    print "Unexpected error:", sys.exc_info()[0]
 
 EOM
 endfunction
